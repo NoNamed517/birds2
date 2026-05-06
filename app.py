@@ -71,6 +71,35 @@ def logout():
 def dashboard():
     return render_template('dashboard.html', user=session['user'], birds=birds_db)
 
+# --- Add new bird ---
+@app.route('/add', methods=['GET', 'POST'])
+@login_required
+def add_bird():
+    if request.method == 'POST':
+        name = request.form.get('name').strip()
+        location = request.form.get('location').strip()
+        date = request.form.get('date')
+        note = request.form.get('note').strip()
+
+        # Validace povinných polí
+        if not name or not date:
+            flash("Název druhu a datum jsou povinné.", "danger")
+            return redirect(url_for('add_bird'))
+
+        # Generování unikátního ID
+        new_id = max([b['id'] for b in birds_db], default=0) + 1
+        birds_db.append({
+            "id": new_id,
+            "name": name,
+            "location": location,
+            "date": date,
+            "note": note
+        })
+        flash("Nový záznam přidán.", "success")
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_bird.html')
+
 # --- Delete bird ---
 @app.route('/delete/<int:bird_id>')
 @login_required
@@ -90,10 +119,10 @@ def edit_bird(bird_id):
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        bird['name'] = request.form.get('name')
-        bird['location'] = request.form.get('location')
+        bird['name'] = request.form.get('name').strip()
+        bird['location'] = request.form.get('location').strip()
         bird['date'] = request.form.get('date')
-        bird['note'] = request.form.get('note')
+        bird['note'] = request.form.get('note').strip()
         flash("Záznam aktualizován.", "success")
         return redirect(url_for('dashboard'))
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Přidat nový záznam ptáka</title>
+</head>
+<body>
+    <h2>Přidat nový záznam ptáka</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li style="color: {% if category=='danger' %}red{% elif category=='success' %}green{% else %}blue{% endif %}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Název druhu*:</label>
+        <input type="text" name="name" required><br><br>
+
+        <label>Lokalita:</label>
+        <input type="text" name="location"><br><br>
+
+        <label>Datum pozorování*:</label>
+        <input type="date" name="date" required><br><br>
+
+        <label>Poznámka:</label>
+        <textarea name="note"></textarea><br><br>
+
+        <button type="submit">Uložit</button>
+        <a href="{{ url_for('dashboard') }}">Zpět</a>
+    </form>
+</body>
+</html>

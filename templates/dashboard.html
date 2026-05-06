@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('logout') }}">Odhlásit</a>
+    </nav>
+    <h1>Vítejte, {{ user }}!</h1>
+    <p>Toto je chráněná stránka dashboard.</p>
+</body>
+</html>

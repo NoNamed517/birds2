@@ -1,14 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # pro sessions, v produkci používej env proměnnou
+app.secret_key = 'supersecretkey'
 
 # --- Simulovaná databáze uživatelů ---
 users_db = {
     "test@example.com": generate_password_hash("heslo123")
 }
+
+# --- Simulovaná databáze ptáků ---
+birds_db = [
+    {
+        "id": 1,
+        "name": "Slavík obecný",
+        "location": "Praha",
+        "date": "2026-05-01",
+        "note": "Zpíval u řeky"
+    },
+    {
+        "id": 2,
+        "name": "Vrabec domácí",
+        "location": "Brno",
+        "date": "2026-05-03",
+        "note": "Věděl si rady s pečivem"
+    }
+]
 
 # --- Decorator pro ochranu rout ---
 def login_required(f):
@@ -46,11 +65,39 @@ def logout():
     flash("Odhlášeno.", "info")
     return redirect(url_for('login'))
 
-# --- Protected route ---
+# --- Dashboard / Birds dataset ---
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', user=session['user'])
+    return render_template('dashboard.html', user=session['user'], birds=birds_db)
+
+# --- Delete bird ---
+@app.route('/delete/<int:bird_id>')
+@login_required
+def delete_bird(bird_id):
+    global birds_db
+    birds_db = [b for b in birds_db if b['id'] != bird_id]
+    flash("Záznam odstraněn.", "info")
+    return redirect(url_for('dashboard'))
+
+# --- Edit bird ---
+@app.route('/edit/<int:bird_id>', methods=['GET', 'POST'])
+@login_required
+def edit_bird(bird_id):
+    bird = next((b for b in birds_db if b['id'] == bird_id), None)
+    if not bird:
+        flash("Záznam nenalezen.", "danger")
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        bird['name'] = request.form.get('name')
+        bird['location'] = request.form.get('location')
+        bird['date'] = request.form.get('date')
+        bird['note'] = request.form.get('note')
+        flash("Záznam aktualizován.", "success")
+        return redirect(url_for('dashboard'))
+
+    return render_template('edit_bird.html', bird=bird)
 
 # --- Homepage redirect ---
 @app.route('/')

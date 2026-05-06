@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Upravit záznam ptáka</title>
+</head>
+<body>
+    <h2>Upravit záznam ptáka</h2>
+    <form method="POST">
+        <label>Název druhu:</label>
+        <input type="text" name="name" value="{{ bird.name }}" required><br><br>
+
+        <label>Lokalita:</label>
+        <input type="text" name="location" value="{{ bird.location }}" required><br><br>
+
+        <label>Datum pozorování:</label>
+        <input type="date" name="date" value="{{ bird.date }}" required><br><br>
+
+        <label>Poznámka:</label>
+        <textarea name="note">{{ bird.note }}</textarea><br><br>
+
+        <button type="submit">Uložit</button>
+        <a href="{{ url_for('dashboard') }}">Zpět</a>
+    </form>
+</body>
+</html>
